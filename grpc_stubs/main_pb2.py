@@ -13,17 +13,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\x32?\n\x07\x43hatter\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"!\n\rUpdateRequest\x12\x10\n\x08\x64\x61tabase\x18\x01 \x01(\t\"\x10\n\x0eUpdateResponse\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\x32t\n\x07\x43hatter\x12\x33\n\x0eUpdateDatabase\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'main_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _HEARTBEATREQUEST._serialized_start=14
-  _HEARTBEATREQUEST._serialized_end=32
-  _HEARTBEATRESPONSE._serialized_start=34
-  _HEARTBEATRESPONSE._serialized_end=69
-  _CHATTER._serialized_start=71
-  _CHATTER._serialized_end=134
+  _UPDATEREQUEST._serialized_start=14
+  _UPDATEREQUEST._serialized_end=47
+  _UPDATERESPONSE._serialized_start=49
+  _UPDATERESPONSE._serialized_end=65
+  _HEARTBEATREQUEST._serialized_start=67
+  _HEARTBEATREQUEST._serialized_end=85
+  _HEARTBEATRESPONSE._serialized_start=87
+  _HEARTBEATRESPONSE._serialized_end=122
+  _CHATTER._serialized_start=124
+  _CHATTER._serialized_end=240
 # @@protoc_insertion_point(module_scope)

@@ -1,12 +1,27 @@
 syntax = "proto3";
 
+// The chat service definition.
 service Chatter {
+  // Updates the databases of the other servers
+  rpc UpdateDatabase(UpdateRequest) returns (UpdateResponse) {}
+  // Sends heartbeat check to other servers
   rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
 }
 
+// The request message containing the user's name.
+message UpdateRequest {
+  string database = 1;
+}
+
+// The response message containing the greetings
+message UpdateResponse {
+}
+
+// Heartbeat request
 message HeartbeatRequest {
 }
 
+// Heartbeat response with leader of the server
 message HeartbeatResponse {
   int32 leader = 1;
 }

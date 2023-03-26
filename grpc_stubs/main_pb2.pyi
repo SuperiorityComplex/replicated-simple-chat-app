@@ -13,3 +13,13 @@ class HeartbeatResponse(_message.Message):
     LEADER_FIELD_NUMBER: _ClassVar[int]
     leader: int
     def __init__(self, leader: _Optional[int] = ...) -> None: ...
+
+class UpdateRequest(_message.Message):
+    __slots__ = ["database"]
+    DATABASE_FIELD_NUMBER: _ClassVar[int]
+    database: str
+    def __init__(self, database: _Optional[str] = ...) -> None: ...
+
+class UpdateResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
