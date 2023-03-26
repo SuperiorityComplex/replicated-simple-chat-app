@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+service Chatter {
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
+}
+
+message HeartbeatRequest {
+}
+
+message HeartbeatResponse {
+  int32 leader = 1;
+}
