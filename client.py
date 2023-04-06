@@ -131,7 +131,8 @@ def main():
             print(response.message, flush = True)
     
         # the server we connected to went down during the user action
-        # TODO @Ivan, if the leader changes and the one we are connected to is no longer the leader then raise the following exception
+        # this assumes that the client was connected to the leader server, then that went down, and another server has been already determined
+        #           to be the leader. the client will connect to that new leader.
         except grpc._channel._InactiveRpcError:
             # stop the listening thread
             listen_thread.join()
