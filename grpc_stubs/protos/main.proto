@@ -12,6 +12,9 @@ service Chatter {
   rpc ServerChat (UserRequest) returns (Message) {}
   // Sends stream of client<>client messages to each client
   rpc ClientChat (Username) returns (stream Message) {}
+
+  // Client asking whether server is leader
+  rpc LeaderCheck (LeaderRequest) returns (LeaderResponse) {}
 }
 
 // The request message containing the user's name.
@@ -45,4 +48,11 @@ message Message {
 
 message Username {
   string username = 1;
+}
+
+message LeaderRequest {
+}
+
+message LeaderResponse {
+  int32 leader = 1;
 }

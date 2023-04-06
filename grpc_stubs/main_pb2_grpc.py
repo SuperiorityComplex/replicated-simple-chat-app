@@ -35,6 +35,11 @@ class ChatterStub(object):
                 request_serializer=main__pb2.Username.SerializeToString,
                 response_deserializer=main__pb2.Message.FromString,
                 )
+        self.LeaderCheck = channel.unary_unary(
+                '/Chatter/LeaderCheck',
+                request_serializer=main__pb2.LeaderRequest.SerializeToString,
+                response_deserializer=main__pb2.LeaderResponse.FromString,
+                )
 
 
 class ChatterServicer(object):
@@ -69,6 +74,13 @@ class ChatterServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def LeaderCheck(self, request, context):
+        """Client asking whether server is leader
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatterServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -91,6 +103,11 @@ def add_ChatterServicer_to_server(servicer, server):
                     servicer.ClientChat,
                     request_deserializer=main__pb2.Username.FromString,
                     response_serializer=main__pb2.Message.SerializeToString,
+            ),
+            'LeaderCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.LeaderCheck,
+                    request_deserializer=main__pb2.LeaderRequest.FromString,
+                    response_serializer=main__pb2.LeaderResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -168,5 +185,22 @@ class Chatter(object):
         return grpc.experimental.unary_stream(request, target, '/Chatter/ClientChat',
             main__pb2.Username.SerializeToString,
             main__pb2.Message.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def LeaderCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Chatter/LeaderCheck',
+            main__pb2.LeaderRequest.SerializeToString,
+            main__pb2.LeaderResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -14,6 +14,16 @@ class HeartbeatResponse(_message.Message):
     leader: int
     def __init__(self, leader: _Optional[int] = ...) -> None: ...
 
+class LeaderRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class LeaderResponse(_message.Message):
+    __slots__ = ["leader"]
+    LEADER_FIELD_NUMBER: _ClassVar[int]
+    leader: int
+    def __init__(self, leader: _Optional[int] = ...) -> None: ...
+
 class Message(_message.Message):
     __slots__ = ["message"]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]

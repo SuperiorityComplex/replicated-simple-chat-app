@@ -57,6 +57,9 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
                 database[username] = []
                 yield main_pb2.Message(message = msg)
 
+    def LeaderCheck(self, request, context):
+        return main_pb2.LeaderResponse(leader = leader)
+
 
 
 def gracefully_shutdown():
@@ -205,6 +208,8 @@ def start_heartbeat(ext_server_id):
 
 
 def handle_server_response(action, username, recipient, message):
+    print("Received action:", action)
+
     if(action == "list"):
         msg = ", ".join(list(database.keys()))
         return main_pb2.Message(message = msg)

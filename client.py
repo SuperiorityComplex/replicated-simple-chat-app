@@ -10,6 +10,9 @@ sys.path.append('./grpc_stubs')
 import main_pb2
 import main_pb2_grpc
 
+# addresses of the three possible servers
+server_list = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
+
 def listen_client_messages(stub, username):
     """
     Receives async messages from other clients.
@@ -23,20 +26,35 @@ def listen_client_messages(stub, username):
     except:
         return
 
+def find_leader():
+    """
+    Finds which server is the leader.
+    """
+    channel = None
+    stub = None
+    connected_to_leader = False
+    while not connected_to_leader:
+        for i, addr in enumerate(server_list):
+            try:
+                channel = grpc.insecure_channel(addr)
+                stub = main_pb2_grpc.ChatterStub(channel)
+
+                # ask server who leader is
+                resp = stub.LeaderCheck(main_pb2.LeaderRequest())
+                return resp.leader
+        
+            # server was not live, try next server
+            except grpc._channel._InactiveRpcError:
+                 continue
+        time.sleep(3)
+
 def main():
     listen_thread = None
-    
-    # TODO: need to write some kind of function which connects to the leader
-    # while loop, wait 5 sec then try connecting in round robin
-    # --> if server down, connection fails
-    # --> if not leader, server will refuse the connection
-    # --> keep going until you are connected to the leader server
-    host = "127.0.0.1"
-    port = "3000"
 
-    channel = grpc.insecure_channel(f"{host}:{port}")
+    leader = find_leader()
+    channel = grpc.insecure_channel(server_list[leader])
     stub = main_pb2_grpc.ChatterStub(channel)
-
+    
     print("Enter username (will be created if it doesn't exist): ", flush = True)
     while True:
         username = input()
@@ -58,9 +76,9 @@ def main():
 
     print("Actions: list, send <user>, delete <user>, quit", flush = True)
 
-    try:
-        # client ui loop, cannot pass stub as function argument so it all goes here
-        while True:
+    # client ui loop, cannot pass stub as function argument so it all goes here
+    while True:
+        try:
             action = input("> ")
             
             action_list = action.split()
@@ -112,19 +130,34 @@ def main():
 
             print(response.message, flush = True)
     
-    # TODO: the server we were connected to has gone down, we need to connect to another server
-    # except:
-    #     pass
+        # the server we connected to went down during the user action
+        # TODO @Ivan, if the leader changes and the one we are connected to is no longer the leader then raise the following exception
+        except grpc._channel._InactiveRpcError:
+            # stop the listening thread
+            listen_thread.join()
 
-    # TODO: the server we were connected to is no longer the leader, we need to connect to another server
+            # find the new leader
+            leader = find_leader()
+            channel = grpc.insecure_channel(server_list[leader])
+            stub = main_pb2_grpc.ChatterStub(channel) 
 
+            # restart the listening thread
+            listen_thread = threading.Thread(target=(listen_client_messages), args=(stub, username))
+            listen_thread.start()
 
-    except KeyboardInterrupt:
-        # send quit to server
-        response = stub.ServerChat(
-            main_pb2.UserRequest(action="quit", username=username, recipient='', message="")
-        )
-        listen_thread.join()
+            print("You were reconnected to the server. Please try again.")
+            pass
+
+        except KeyboardInterrupt:
+            # send quit to server
+            try:
+                response = stub.ServerChat(
+                    main_pb2.UserRequest(action="quit", username=username, recipient='', message="")
+                )
+            except grpc._channel._InactiveRpcError:
+                pass
+            listen_thread.join()
+            break
 
     listen_thread.join()
     
