@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"!\n\rUpdateRequest\x12\x10\n\x08\x64\x61tabase\x18\x01 \x01(\t\"\x10\n\x0eUpdateResponse\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\x32t\n\x07\x43hatter\x12\x33\n\x0eUpdateDatabase\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"!\n\rUpdateRequest\x12\x10\n\x08\x64\x61tabase\x18\x01 \x01(\t\"\x10\n\x0eUpdateResponse\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\"S\n\x0bUserRequest\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x11\n\trecipient\x18\x03 \x01(\t\x12\x0f\n\x07message\x18\x04 \x01(\t\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1c\n\x08Username\x12\x10\n\x08username\x18\x01 \x01(\t2\xc3\x01\n\x07\x43hatter\x12\x33\n\x0eUpdateDatabase\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x12&\n\nServerChat\x12\x0c.UserRequest\x1a\x08.Message\"\x00\x12%\n\nClientChat\x12\t.Username\x1a\x08.Message\"\x00\x30\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'main_pb2', globals())
@@ -28,6 +28,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _HEARTBEATREQUEST._serialized_end=85
   _HEARTBEATRESPONSE._serialized_start=87
   _HEARTBEATRESPONSE._serialized_end=122
-  _CHATTER._serialized_start=124
-  _CHATTER._serialized_end=240
+  _USERREQUEST._serialized_start=124
+  _USERREQUEST._serialized_end=207
+  _MESSAGE._serialized_start=209
+  _MESSAGE._serialized_end=235
+  _USERNAME._serialized_start=237
+  _USERNAME._serialized_end=265
+  _CHATTER._serialized_start=268
+  _CHATTER._serialized_end=463
 # @@protoc_insertion_point(module_scope)

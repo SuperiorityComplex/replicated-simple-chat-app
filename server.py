@@ -30,14 +30,34 @@ live_servers = [None, None, None]
 
 # Database of pending messages
 database = {"ivan": []}
+# dict of active users
+active_users = []
 
 class ChatterServicer(main_pb2_grpc.ChatterServicer):
     def Heartbeat(self, request, context):
         return main_pb2.HeartbeatResponse(leader=leader)
+    
     def UpdateDatabase(self, request, context):
         global database
         database = json.loads(request.database)
         return main_pb2.UpdateResponse()
+    
+    def ServerChat(self, request, context): 
+        return handle_server_response(request.action, request.username, request.recipient, request.message)
+    
+    def ClientChat(self, username, context):
+        username = username.username
+        
+        if username not in active_users:
+            active_users.append(username)
+
+        while username in active_users:
+            if username in database and len(database[username]) != 0:
+                msg = "\n".join(database[username])
+                database[username] = []
+                yield main_pb2.Message(message = msg)
+
+
 
 def gracefully_shutdown():
     """
@@ -85,6 +105,7 @@ def start_server():
     server = grpc.server(concurrent.futures.ThreadPoolExecutor(max_workers=10))
     main_pb2_grpc.add_ChatterServicer_to_server(ChatterServicer(), server)
     server.add_insecure_port(replicas[server_id])
+    print("Started server on", replicas[server_id])
     server.start()
     server.wait_for_termination()
 
@@ -183,6 +204,50 @@ def start_heartbeat(ext_server_id):
 #         count += 1
 
 
+def handle_server_response(action, username, recipient, message):
+    if(action == "list"):
+        msg = ", ".join(list(database.keys()))
+        return main_pb2.Message(message = msg)
+    
+    elif(action == "delete"):
+        if(username in active_users):
+            return main_pb2.Message(message = "Cannot delete logged in user.")
+
+        if(username in list(database.keys())):
+            del database[username]
+            return main_pb2.Message(message = "User deleted successfully.")
+
+        else:
+            return main_pb2.Message(message = "User does not exist.")
+    
+    elif(action == "send"):
+        chat = f"{username} says: {message}"
+        if(recipient not in database.keys()):
+            response =  "The recipient does not exist."
+        else:
+            # TODO: here should send the databases out to replicas? or maybe should do it on heartbeats?
+            database[recipient].append(chat)
+            response = "Message sent successfully."
+        return main_pb2.Message(message = response)
+    
+    elif(action == "join"):
+        if (username in active_users): # already logged in, refuse client
+            return main_pb2.Message(message = "Already logged in elsewhere.")
+
+        active_users.append(username)
+
+        if(username not in database.keys()):
+            response = "User created. Welcome!"
+            database[username] = []
+        else:
+            response = "Welcome back!"
+
+        return main_pb2.Message(message = response)
+    
+    elif(action == "quit"):
+        active_users.remove(username)
+        return main_pb2.Message(message = "")
+
 def init_server():
     """
     Initializes a server
@@ -208,6 +273,11 @@ def init_server():
 def main():
     global server_id
     server_id = get_sys_args()
+    
+    if server_id not in [0, 1, 2]:
+        print("server_id must be 0, 1, 2")
+        return
+    
     live_servers[server_id] = True
     run_event.set()
     try:

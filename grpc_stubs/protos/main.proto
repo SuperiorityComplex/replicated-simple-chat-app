@@ -6,6 +6,12 @@ service Chatter {
   rpc UpdateDatabase(UpdateRequest) returns (UpdateResponse) {}
   // Sends heartbeat check to other servers
   rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
+
+
+  // Client chat to server
+  rpc ServerChat (UserRequest) returns (Message) {}
+  // Sends stream of client<>client messages to each client
+  rpc ClientChat (Username) returns (stream Message) {}
 }
 
 // The request message containing the user's name.
@@ -24,4 +30,19 @@ message HeartbeatRequest {
 // Heartbeat response with leader of the server
 message HeartbeatResponse {
   int32 leader = 1;
+}
+
+message UserRequest {
+  string action = 1;
+  string username = 2;
+  string recipient = 3;
+  string message = 4;
+}
+
+message Message {
+  string message = 1;
+}
+
+message Username {
+  string username = 1;
 }

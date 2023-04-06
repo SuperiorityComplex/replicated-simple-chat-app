@@ -25,6 +25,16 @@ class ChatterStub(object):
                 request_serializer=main__pb2.HeartbeatRequest.SerializeToString,
                 response_deserializer=main__pb2.HeartbeatResponse.FromString,
                 )
+        self.ServerChat = channel.unary_unary(
+                '/Chatter/ServerChat',
+                request_serializer=main__pb2.UserRequest.SerializeToString,
+                response_deserializer=main__pb2.Message.FromString,
+                )
+        self.ClientChat = channel.unary_stream(
+                '/Chatter/ClientChat',
+                request_serializer=main__pb2.Username.SerializeToString,
+                response_deserializer=main__pb2.Message.FromString,
+                )
 
 
 class ChatterServicer(object):
@@ -32,7 +42,7 @@ class ChatterServicer(object):
     """
 
     def UpdateDatabase(self, request, context):
-        """Starts a chat with the server
+        """Updates the databases of the other servers
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -40,6 +50,20 @@ class ChatterServicer(object):
 
     def Heartbeat(self, request, context):
         """Sends heartbeat check to other servers
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ServerChat(self, request, context):
+        """Client chat to server
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ClientChat(self, request, context):
+        """Sends stream of client<>client messages to each client
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -57,6 +81,16 @@ def add_ChatterServicer_to_server(servicer, server):
                     servicer.Heartbeat,
                     request_deserializer=main__pb2.HeartbeatRequest.FromString,
                     response_serializer=main__pb2.HeartbeatResponse.SerializeToString,
+            ),
+            'ServerChat': grpc.unary_unary_rpc_method_handler(
+                    servicer.ServerChat,
+                    request_deserializer=main__pb2.UserRequest.FromString,
+                    response_serializer=main__pb2.Message.SerializeToString,
+            ),
+            'ClientChat': grpc.unary_stream_rpc_method_handler(
+                    servicer.ClientChat,
+                    request_deserializer=main__pb2.Username.FromString,
+                    response_serializer=main__pb2.Message.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -100,5 +134,39 @@ class Chatter(object):
         return grpc.experimental.unary_unary(request, target, '/Chatter/Heartbeat',
             main__pb2.HeartbeatRequest.SerializeToString,
             main__pb2.HeartbeatResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ServerChat(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Chatter/ServerChat',
+            main__pb2.UserRequest.SerializeToString,
+            main__pb2.Message.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ClientChat(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/Chatter/ClientChat',
+            main__pb2.Username.SerializeToString,
+            main__pb2.Message.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -14,6 +14,12 @@ class HeartbeatResponse(_message.Message):
     leader: int
     def __init__(self, leader: _Optional[int] = ...) -> None: ...
 
+class Message(_message.Message):
+    __slots__ = ["message"]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    message: str
+    def __init__(self, message: _Optional[str] = ...) -> None: ...
+
 class UpdateRequest(_message.Message):
     __slots__ = ["database"]
     DATABASE_FIELD_NUMBER: _ClassVar[int]
@@ -23,3 +29,21 @@ class UpdateRequest(_message.Message):
 class UpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class UserRequest(_message.Message):
+    __slots__ = ["action", "message", "recipient", "username"]
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    RECIPIENT_FIELD_NUMBER: _ClassVar[int]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    action: str
+    message: str
+    recipient: str
+    username: str
+    def __init__(self, action: _Optional[str] = ..., username: _Optional[str] = ..., recipient: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+
+class Username(_message.Message):
+    __slots__ = ["username"]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    username: str
+    def __init__(self, username: _Optional[str] = ...) -> None: ...
