@@ -1,0 +1,43 @@
+Engineering Notebook.
+
+See README for instructions on deployment.
+
+For this assignment, there are no functions at all which can be unit tested, therefore we did not write unit tests.
+
+We demonstrate that the replicas can be on different machines by running the servers on different AWS instances.
+
+Server Pending Messages Persistence:
+TODO ivan: write abt save to csv
+
+Server Replication:
+We accomplish 2-fault-tolerance with the following methods:
+
+    TODO ivan: backend side
+
+Client 
+    On the frontend, the client knows the addresses of all three servers.
+    When it initially tries to connect, it starts iterating through the addresses, attempting to call the RPC find_leader.
+    Whichever server the client connects to will tell the client which is the leader. The client now knows where to open the
+    gRPC channel.
+
+    If, the client is operating and any one of the replicas goes down, nothing will happen because the leader is up,
+    and the client is connected to the leader.
+    But, if the client is operating and the leader goes down, then the client will get a _InactiveRpcError. When this happens,
+    we catch the exception and find the new leader again by iterating through the addresses and calling the find_leader RPO.
+
+Otherwise, everything is the same as the gRPC implementation of HW1. If it ain't broke don't fix it.
+
+
+
+To demonstrate that we accomplish the two features for this assignment, we do the following demos:
+Feature 1: Persistent Storage
+    Show for 1 server it can go down / up and messages persist. Show same for 2 servers and 3 servers. 
+    Can ask the audience which order to send the servers down to show this is arbitrary.
+Feature 2: 2-fault tolerance
+    Spin up A, B, C, test (show normal operation on client side). 
+    Shut down A, test. 
+    Shut down B, test. 
+    Restore A, test. 
+    Restore B, test. 
+    Shut down C, test. 
+    Also can ask the audience to choose order of which servers to kill to show this is arbitrary.
