@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"!\n\rUpdateRequest\x12\x10\n\x08\x64\x61tabase\x18\x01 \x01(\t\"\x10\n\x0eUpdateResponse\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\"S\n\x0bUserRequest\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x11\n\trecipient\x18\x03 \x01(\t\x12\x0f\n\x07message\x18\x04 \x01(\t\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1c\n\x08Username\x12\x10\n\x08username\x18\x01 \x01(\t\"\x0f\n\rLeaderRequest\" \n\x0eLeaderResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\x32\xf5\x01\n\x07\x43hatter\x12\x33\n\x0eUpdateDatabase\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x12&\n\nServerChat\x12\x0c.UserRequest\x1a\x08.Message\"\x00\x12%\n\nClientChat\x12\t.Username\x1a\x08.Message\"\x00\x30\x01\x12\x30\n\x0bLeaderCheck\x12\x0e.LeaderRequest\x1a\x0f.LeaderResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmain.proto\"7\n\rUpdateRequest\x12\x10\n\x08\x64\x61tabase\x18\x01 \x01(\t\x12\x14\n\x0c\x61\x63tive_users\x18\x02 \x01(\t\"\x10\n\x0eUpdateResponse\"\x12\n\x10HeartbeatRequest\"#\n\x11HeartbeatResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\"S\n\x0bUserRequest\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\t\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x11\n\trecipient\x18\x03 \x01(\t\x12\x0f\n\x07message\x18\x04 \x01(\t\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1c\n\x08Username\x12\x10\n\x08username\x18\x01 \x01(\t\"\x0f\n\rLeaderRequest\" \n\x0eLeaderResponse\x12\x0e\n\x06leader\x18\x01 \x01(\x05\x32\xf5\x01\n\x07\x43hatter\x12\x33\n\x0eUpdateDatabase\x12\x0e.UpdateRequest\x1a\x0f.UpdateResponse\"\x00\x12\x34\n\tHeartbeat\x12\x11.HeartbeatRequest\x1a\x12.HeartbeatResponse\"\x00\x12&\n\nServerChat\x12\x0c.UserRequest\x1a\x08.Message\"\x00\x12%\n\nClientChat\x12\t.Username\x1a\x08.Message\"\x00\x30\x01\x12\x30\n\x0bLeaderCheck\x12\x0e.LeaderRequest\x1a\x0f.LeaderResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'main_pb2', globals())
@@ -21,23 +21,23 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _UPDATEREQUEST._serialized_start=14
-  _UPDATEREQUEST._serialized_end=47
-  _UPDATERESPONSE._serialized_start=49
-  _UPDATERESPONSE._serialized_end=65
-  _HEARTBEATREQUEST._serialized_start=67
-  _HEARTBEATREQUEST._serialized_end=85
-  _HEARTBEATRESPONSE._serialized_start=87
-  _HEARTBEATRESPONSE._serialized_end=122
-  _USERREQUEST._serialized_start=124
-  _USERREQUEST._serialized_end=207
-  _MESSAGE._serialized_start=209
-  _MESSAGE._serialized_end=235
-  _USERNAME._serialized_start=237
-  _USERNAME._serialized_end=265
-  _LEADERREQUEST._serialized_start=267
-  _LEADERREQUEST._serialized_end=282
-  _LEADERRESPONSE._serialized_start=284
-  _LEADERRESPONSE._serialized_end=316
-  _CHATTER._serialized_start=319
-  _CHATTER._serialized_end=564
+  _UPDATEREQUEST._serialized_end=69
+  _UPDATERESPONSE._serialized_start=71
+  _UPDATERESPONSE._serialized_end=87
+  _HEARTBEATREQUEST._serialized_start=89
+  _HEARTBEATREQUEST._serialized_end=107
+  _HEARTBEATRESPONSE._serialized_start=109
+  _HEARTBEATRESPONSE._serialized_end=144
+  _USERREQUEST._serialized_start=146
+  _USERREQUEST._serialized_end=229
+  _MESSAGE._serialized_start=231
+  _MESSAGE._serialized_end=257
+  _USERNAME._serialized_start=259
+  _USERNAME._serialized_end=287
+  _LEADERREQUEST._serialized_start=289
+  _LEADERREQUEST._serialized_end=304
+  _LEADERRESPONSE._serialized_start=306
+  _LEADERRESPONSE._serialized_end=338
+  _CHATTER._serialized_start=341
+  _CHATTER._serialized_end=586
 # @@protoc_insertion_point(module_scope)

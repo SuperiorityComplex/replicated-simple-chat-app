@@ -31,10 +31,12 @@ class Message(_message.Message):
     def __init__(self, message: _Optional[str] = ...) -> None: ...
 
 class UpdateRequest(_message.Message):
-    __slots__ = ["database"]
+    __slots__ = ["active_users", "database"]
+    ACTIVE_USERS_FIELD_NUMBER: _ClassVar[int]
     DATABASE_FIELD_NUMBER: _ClassVar[int]
+    active_users: str
     database: str
-    def __init__(self, database: _Optional[str] = ...) -> None: ...
+    def __init__(self, database: _Optional[str] = ..., active_users: _Optional[str] = ...) -> None: ...
 
 class UpdateResponse(_message.Message):
     __slots__ = []

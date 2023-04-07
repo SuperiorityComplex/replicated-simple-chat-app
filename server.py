@@ -39,9 +39,12 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
         return main_pb2.HeartbeatResponse(leader=leader)
     
     def UpdateDatabase(self, request, context):
-        global database
+        global database, active_users, server_id
         database = json.loads(request.database)
-        save_db_to_disk(database, get_sys_args())
+        active_users = json.loads(request.active_users)
+        print("Database", database)
+        print("Active Users", active_users)
+        save_db_to_disk(database, server_id)
         return main_pb2.UpdateResponse()
     
     def ServerChat(self, request, context): 
@@ -58,6 +61,7 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
                 msg = "\n".join(database[username])
                 database[username] = []
                 yield main_pb2.Message(message = msg)
+        send_database_and_users()
 
     def LeaderCheck(self, request, context):
         return main_pb2.LeaderResponse(leader = leader)
@@ -141,7 +145,7 @@ def valdiate_leader():
             gracefully_shutdown()
 
 
-def send_database():
+def send_database_and_users():
     """
     Sends the database to other servers
     @Parameter: None.
@@ -156,7 +160,7 @@ def send_database():
             stub = main_pb2_grpc.ChatterStub(channel)
             try:
                 save_db_to_disk(database, server_id)
-                stub.UpdateDatabase(main_pb2.UpdateRequest(database=json.dumps(database)))
+                stub.UpdateDatabase(main_pb2.UpdateRequest(database=json.dumps(database), active_users=json.dumps(active_users)))
             except:
                 print("Server {} is down".format(index))
                 live_servers[index] = False
@@ -198,22 +202,23 @@ def start_heartbeat(ext_server_id):
         send_heartbeat(stub, ext_server_id)
         valdiate_leader()
 
-def test_database_sync():
-    count = 0
-    global server_id
-    while run_event.is_set():
-        if(leader is None):
-            continue
-        if(leader != server_id):
-            continue
-        time.sleep(2)
-        if("ivan" not in database):
-            database["ivan"] = []
-        else:
-            database["ivan"].append("HI{}".format(count))
-        print(database)
-        send_database()
-        count += 1
+# def test_database_sync():
+#     count = 0
+#     global server_id
+#     while run_event.is_set():
+#         if(leader is None):
+#             continue
+#         if(leader != server_id):
+#             continue
+#         time.sleep(2)
+#         if("ivan" not in database):
+#             database["ivan"] = []
+#         else:
+#             database["ivan"].append("HI{}".format(count))
+#         print(database)
+#         print(active_users)
+#         send_database_and_users()
+#         count += 1
 
 
 def handle_server_response(action, username, recipient, message):
@@ -229,8 +234,8 @@ def handle_server_response(action, username, recipient, message):
 
         if(username in list(database.keys())):
             del database[username]
+            send_database_and_users()
             return main_pb2.Message(message = "User deleted successfully.")
-
         else:
             return main_pb2.Message(message = "User does not exist.")
     
@@ -241,6 +246,8 @@ def handle_server_response(action, username, recipient, message):
         else:
             # TODO: here should send the databases out to replicas? or maybe should do it on heartbeats?
             database[recipient].append(chat)
+            # DONE
+            send_database_and_users()
             response = "Message sent successfully."
         return main_pb2.Message(message = response)
     
@@ -253,13 +260,16 @@ def handle_server_response(action, username, recipient, message):
         if(username not in database.keys()):
             response = "User created. Welcome!"
             database[username] = []
+            send_database_and_users()
         else:
             response = "Welcome back!"
+
 
         return main_pb2.Message(message = response)
     
     elif(action == "quit"):
         active_users.remove(username)
+        send_database_and_users()
         return main_pb2.Message(message = "")
 
 def init_server():
@@ -276,11 +286,11 @@ def init_server():
             )
             heartbeat_thread.start()
             running_threads.append(heartbeat_thread)
-    test_thread = threading.Thread(
-        target=test_database_sync, args=()
-    )
-    test_thread.start()
-    running_threads.append(test_thread)
+    # test_thread = threading.Thread(
+    #     target=test_database_sync, args=()
+    # )
+    # test_thread.start()
+    # running_threads.append(test_thread)
     start_server()
 
 

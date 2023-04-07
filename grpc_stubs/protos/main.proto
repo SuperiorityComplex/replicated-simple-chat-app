@@ -20,6 +20,7 @@ service Chatter {
 // The request message containing the user's name.
 message UpdateRequest {
   string database = 1;
+  string active_users = 2;
 }
 
 // The response message containing the greetings
