@@ -6,6 +6,24 @@ For this assignment, there are no functions at all which can be unit tested, the
 
 We demonstrate that the replicas can be on different machines by running the servers on different AWS instances.
 
+Changes from assignment 1:
+    We generally use the same structure from the first programming assignment, gRPC version.
+    We use gRPC for the abstracted communication between the server replicas and between the client and server.
+
+    Notably, in assignment 1 we used a polling method for client<>client communication.
+        This old method worked by using a simple gRPC call, all client<>client chats were stored in the pending
+        message database and every 2 seconds the clients would poll the server and get all the chats.
+
+    This wouldn't have worked with the replicas for this assignment, because if all messages are stored in the 
+    pending message database and then that server goes down before the poll comes in, then the messages would
+    be lost. This would have meant that every chat that gets sent would need to trigger a replica update,
+    and could have run into some timing issues.
+
+    So, for this assignment we make the client<>client messages use a streaming RPC, where the chats
+    are continuously fed to the client directly rather than going into the pending message database.
+
+    Otherwise, everything is the same as the gRPC implementation of HW1. If it ain't broke don't fix it.
+
 Server Pending Messages Persistence:
 TODO ivan: write abt save to csv
 
@@ -25,7 +43,7 @@ Client
     But, if the client is operating and the leader goes down, then the client will get a _InactiveRpcError. When this happens,
     we catch the exception and find the new leader again by iterating through the addresses and calling the find_leader RPO.
 
-Otherwise, everything is the same as the gRPC implementation of HW1. If it ain't broke don't fix it.
+
 
 
 
