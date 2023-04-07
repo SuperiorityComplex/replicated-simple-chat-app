@@ -7,6 +7,7 @@ import time
 import random
 import json
 sys.path.append('./grpc_stubs')
+from db_utils import * 
 import main_pb2
 import main_pb2_grpc
 
@@ -29,7 +30,7 @@ leader = None
 live_servers = [None, None, None]
 
 # Database of pending messages
-database = {"ivan": []}
+database = {}
 # dict of active users
 active_users = []
 
@@ -40,6 +41,7 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
     def UpdateDatabase(self, request, context):
         global database
         database = json.loads(request.database)
+        save_db_to_disk(database, get_sys_args())
         return main_pb2.UpdateResponse()
     
     def ServerChat(self, request, context): 
@@ -107,6 +109,9 @@ def start_server():
     global server
     server = grpc.server(concurrent.futures.ThreadPoolExecutor(max_workers=10))
     main_pb2_grpc.add_ChatterServicer_to_server(ChatterServicer(), server)
+    init_db(server_id)
+    global database
+    database = init_users(server_id)
     server.add_insecure_port(replicas[server_id])
     print("Started server on", replicas[server_id])
     server.start()
@@ -150,6 +155,7 @@ def send_database():
             channel = grpc.insecure_channel(replicas[index])
             stub = main_pb2_grpc.ChatterStub(channel)
             try:
+                save_db_to_disk(database, server_id)
                 stub.UpdateDatabase(main_pb2.UpdateRequest(database=json.dumps(database)))
             except:
                 print("Server {} is down".format(index))
@@ -192,19 +198,22 @@ def start_heartbeat(ext_server_id):
         send_heartbeat(stub, ext_server_id)
         valdiate_leader()
 
-# def test_database_sync():
-#     count = 0
-#     global server_id
-#     while run_event.is_set():
-#         if(leader is None):
-#             continue
-#         if(leader != server_id):
-#             continue
-#         time.sleep(2)
-#         database["ivan"].append("HI{}".format(count))
-#         print(database)
-#         send_database()
-#         count += 1
+def test_database_sync():
+    count = 0
+    global server_id
+    while run_event.is_set():
+        if(leader is None):
+            continue
+        if(leader != server_id):
+            continue
+        time.sleep(2)
+        if("ivan" not in database):
+            database["ivan"] = []
+        else:
+            database["ivan"].append("HI{}".format(count))
+        print(database)
+        send_database()
+        count += 1
 
 
 def handle_server_response(action, username, recipient, message):
@@ -267,11 +276,11 @@ def init_server():
             )
             heartbeat_thread.start()
             running_threads.append(heartbeat_thread)
-    # test_thread = threading.Thread(
-    #     target=test_database_sync, args=()
-    # )
-    # test_thread.start()
-    # running_threads.append(test_thread)
+    test_thread = threading.Thread(
+        target=test_database_sync, args=()
+    )
+    test_thread.start()
+    running_threads.append(test_thread)
     start_server()
 
 
