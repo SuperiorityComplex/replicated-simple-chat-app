@@ -42,8 +42,8 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
         global database, active_users, server_id
         database = json.loads(request.database)
         active_users = json.loads(request.active_users)
-        print("Database", database)
-        print("Active Users", active_users)
+        # print("Database", database)
+        # print("Active Users", active_users)
         save_db_to_disk(database, server_id)
         return main_pb2.UpdateResponse()
     

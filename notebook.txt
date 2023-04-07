@@ -24,13 +24,21 @@ Changes from assignment 1:
 
     Otherwise, everything is the same as the gRPC implementation of HW1. If it ain't broke don't fix it.
 
-Server Pending Messages Persistence:
+
 TODO ivan: write abt save to csv
 
-Server Replication:
-We accomplish 2-fault-tolerance with the following methods:
+Server:
+To make our server 2 fault tolerant, we first spin up 3 replicated instances. Then we use the following methods:
+    1. Leader Election: For leader election, we first initialize a heartbeat for each server based off a random integer from 1 to 5 seconds.
+    This is in the `start_heartbeat` function. This heartbeat is sent to the other servers. If a heartbeat is not received,
+    then the server is assumed to be down and that is noted. The server also validates if the current leader is valid using
+    this same aforementioned random interval and with the `valdiate_leader` function. `validate_leader` determines the leader
+    by first getting all the servers that are alive and their ids and then choosing the server with the smallest id as the leader.
 
-    TODO ivan: backend side
+    2. Replication + Pending Messages Persistence: The database `database` and `active_users` is persisted each time an update is received from a leader or an
+    update is sent from the current leader. This is persisted through the `save_db_to_disk` function. Furthermore, whenever an update is
+    made to the database or active users, the leader will send the update to all the other servers. This is done through the `send_database_and_users`
+    function. This functions sends the latest database and active_users dictionary to the other replicated servers.
 
 Client 
     On the frontend, the client knows the addresses of all three servers.
