@@ -11,7 +11,7 @@ import main_pb2
 import main_pb2_grpc
 
 # addresses of the three possible servers
-server_list = ["127.0.0.1:3000", "127.0.0.1:3001", "ec2-54-198-22-47.compute-1.amazonaws.com:3002"]
+server_list = ["ec2-54-198-22-47.compute-1.amazonaws.com:3000", "ec2-18-232-74-82.compute-1.amazonaws.com:3000", "ec2-18-234-119-162.compute-1.amazonaws.com:3000"]
 
 def listen_client_messages(stub, username):
     """
