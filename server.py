@@ -198,7 +198,7 @@ def start_heartbeat(ext_server_id):
     send_heartbeat(stub, ext_server_id)
     while None in live_servers:
         continue
-    heartbeat_interval = random.randint(1, 2)
+    heartbeat_interval = random.randint(1, 5)
     while run_event.is_set():
         time.sleep(heartbeat_interval)
         send_heartbeat(stub, ext_server_id)
