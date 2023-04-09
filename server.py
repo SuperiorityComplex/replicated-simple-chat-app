@@ -21,7 +21,7 @@ run_event = threading.Event()
 server = None
 
 # Map from index to replicas host
-replicas = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
+replicas = ["127.0.0.1:3000", "127.0.0.1:3001", "ec2-54-198-22-47.compute-1.amazonaws.com:3002"]
 
 # The server id of the current leader
 leader = None
@@ -301,6 +301,10 @@ def main():
     if server_id not in [0, 1, 2]:
         print("server_id must be 0, 1, 2")
         return
+    
+    if ('--use_aws' in sys.argv):
+        global replicas
+        replicas = ["0.0.0.0:3000", "0.0.0.0:3001", "0.0.0.0:3002"]
     
     live_servers[server_id] = True
     run_event.set()
