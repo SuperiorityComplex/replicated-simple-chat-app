@@ -21,7 +21,8 @@ run_event = threading.Event()
 server = None
 
 # Map from index to replicas host
-replicas = ["127.0.0.1:3000", "127.0.0.1:3001", "ec2-54-198-22-47.compute-1.amazonaws.com:3002"]
+self_replicas = ["0.0.0.0:3000", "0.0.0.0:3001", "0.0.0.0:3002"]
+ext_replicas = ["127.0.0.1:3000", "127.0.0.1:3001", "ec2-54-198-22-47.compute-1.amazonaws.com:3002"]
 
 # The server id of the current leader
 leader = None
@@ -116,8 +117,8 @@ def start_server():
     init_db(server_id)
     global database
     database = init_users(server_id)
-    server.add_insecure_port(replicas[server_id])
-    print("Started server on", replicas[server_id])
+    server.add_insecure_port(self_replicas[server_id])
+    print("Started server on", self_replicas[server_id])
     server.start()
     server.wait_for_termination()
 
@@ -144,7 +145,6 @@ def valdiate_leader():
             print("No servers found.")
             gracefully_shutdown()
 
-
 def send_database_and_users():
     """
     Sends the database to other servers
@@ -156,7 +156,7 @@ def send_database_and_users():
         return
     for index, isAlive in enumerate(live_servers):
         if isAlive and index != leader and index != server_id:
-            channel = grpc.insecure_channel(replicas[index])
+            channel = grpc.insecure_channel(ext_replicas[index])
             stub = main_pb2_grpc.ChatterStub(channel)
             try:
                 save_db_to_disk(database, server_id)
@@ -183,7 +183,6 @@ def send_heartbeat(stub, ext_server_id):
         print("Server {} is down".format(ext_server_id))
         live_servers[ext_server_id] = False
 
-
 def start_heartbeat(ext_server_id):
     """
     Starts the heartbeat connection
@@ -191,7 +190,7 @@ def start_heartbeat(ext_server_id):
     - ext_server_id: The id of the server (0, 1, 2).
     @Returns: None.
     """
-    channel = grpc.insecure_channel(replicas[ext_server_id])
+    channel = grpc.insecure_channel(ext_replicas[ext_server_id])
     stub = main_pb2_grpc.ChatterStub(channel)
     send_heartbeat(stub, ext_server_id)
     while None in live_servers:
@@ -301,10 +300,6 @@ def main():
     if server_id not in [0, 1, 2]:
         print("server_id must be 0, 1, 2")
         return
-    
-    if ('--use_aws' in sys.argv):
-        global replicas
-        replicas = ["0.0.0.0:3000", "0.0.0.0:3001", "0.0.0.0:3002"]
     
     live_servers[server_id] = True
     run_event.set()
