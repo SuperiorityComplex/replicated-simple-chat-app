@@ -179,7 +179,8 @@ def send_heartbeat(stub, ext_server_id):
         live_servers[ext_server_id] = True
         global leader
         leader = response.leader
-    except:
+    except (Exception) as e:
+        print(e)
         print("Server {} is down".format(ext_server_id))
         live_servers[ext_server_id] = False
 
@@ -191,11 +192,13 @@ def start_heartbeat(ext_server_id):
     @Returns: None.
     """
     channel = grpc.insecure_channel(ext_replicas[ext_server_id])
+    print(ext_replicas[ext_server_id])
+    print(channel)
     stub = main_pb2_grpc.ChatterStub(channel)
     send_heartbeat(stub, ext_server_id)
     while None in live_servers:
         continue
-    heartbeat_interval = random.randint(1, 5)
+    heartbeat_interval = random.randint(1, 2)
     while run_event.is_set():
         time.sleep(heartbeat_interval)
         send_heartbeat(stub, ext_server_id)
