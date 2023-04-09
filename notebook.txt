@@ -24,9 +24,6 @@ Changes from assignment 1:
 
     Otherwise, everything is the same as the gRPC implementation of HW1. If it ain't broke don't fix it.
 
-
-TODO ivan: write abt save to csv
-
 Server:
 To make our server 2 fault tolerant, we first spin up 3 replicated instances. Then we use the following methods:
     1. Leader Election: For leader election, we first initialize a heartbeat for each server based off a random integer from 1 to 5 seconds.

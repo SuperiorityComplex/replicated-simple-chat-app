@@ -48,6 +48,14 @@ def find_leader():
                  continue
         time.sleep(3)
 
+def check_response(response):
+    """
+    Checks if the server sent a response, and raises an error if so.
+    """
+
+    if response == "ERR: NOT LEADER":
+        raise grpc._channel._InactiveRpcError
+
 def main():
     listen_thread = None
 
@@ -65,6 +73,7 @@ def main():
     response = stub.ServerChat(
         main_pb2.UserRequest(action="join", username=username, recipient="", message="")
     )
+    check_response(response)
     print(response.message, flush = True)
 
     # user logged in elsewhere, end client
@@ -90,6 +99,7 @@ def main():
                 response = stub.ServerChat(
                     main_pb2.UserRequest(action=action_list[0], username=username, recipient='', message="")
                 )
+                check_response(response)
 
             elif (action_list[0] == "send"):
                 if (len(action_list) < 2):
@@ -106,6 +116,7 @@ def main():
                 response = stub.ServerChat(
                     main_pb2.UserRequest(action=action_list[0], username=username, recipient=' '.join(action_list[1:]), message=message)
                 )
+                check_response(response)
 
             elif (action_list[0] == "delete"):
                 if (len(action_list) != 2):
@@ -117,11 +128,13 @@ def main():
                 response = stub.ServerChat(
                     main_pb2.UserRequest(action=action_list[0], username=' '.join(action_list[1:]), recipient='', message="")
                 )
+                check_response(response)
 
             elif (action_list[0] == "quit"):
                 response = stub.ServerChat(
                     main_pb2.UserRequest(action=action_list[0], username=username, recipient='', message="")
                 )
+                check_response(response)
                 return
 
             else:
@@ -155,6 +168,8 @@ def main():
                 response = stub.ServerChat(
                     main_pb2.UserRequest(action="quit", username=username, recipient='', message="")
                 )
+                check_response(response)
+
             except grpc._channel._InactiveRpcError:
                 pass
             listen_thread.join()

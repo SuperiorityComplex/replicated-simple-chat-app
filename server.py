@@ -226,6 +226,12 @@ def start_heartbeat(ext_server_id):
 def handle_server_response(action, username, recipient, message):
     print("Received action:", action)
 
+    # check that this server is the leader
+    global leader
+    global server_id
+    if(server_id != leader):
+        return main_pb2.Message(message = "ERR: NOT LEADER")
+
     if(action == "list"):
         msg = ", ".join(list(database.keys()))
         return main_pb2.Message(message = msg)
