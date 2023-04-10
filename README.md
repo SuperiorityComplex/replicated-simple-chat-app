@@ -7,11 +7,12 @@ These instructions are AWS-specific but similar requirements will apply to other
 1. Spin up three EC2 instance.
 2. Ensure that the vpc has an internet gateway attached to it so that it can be publicly accessed.
 3. Ensure that the security group allows inbound traffic on port 3000 (for server) and 22 (for ssh access).
-4. Download the simple-chat-app repository to the EC2 instance.
+4. Download the replicated-simple-chat-app repository to the EC2 instance.
 5. Install the required dependencies by running `pip install -r requirements.txt`.
-6. Run the servers by running `python server.py --server_id <0/1/2>`.
-7. Edit the client/main.py file to change the `server_list` list entries to the public IPs of the EC2 instances.
-8. Run the client by running `python client.py`.
+6. Edit the server.py file to change the `replica_addresses` list entries to the public IPs of the EC2 instances.
+7. Run the servers by running `python server.py --server_id <0/1/2>`.
+8. Edit the client.py file to change the `server_list` list entries to the public IPs of the EC2 instances.
+9. Run the client by running `python client.py`.
 
 ### Generating grpc stubs (Not Required)
 
