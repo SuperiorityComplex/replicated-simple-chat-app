@@ -8,7 +8,7 @@ import main_pb2_grpc
 
 # addresses of the three possible servers
 # server_list = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
-server_list = ["ec2-54-211-191-75.compute-1.amazonaws.com:3000", "ec2-184-73-151-136.compute-1.amazonaws.com:3000", "ec2-18-234-254-108.compute-1.amazonaws.com:3000"]
+server_list = ["ec2-3-94-255-24.compute-1.amazonaws.com:3000", "ec2-54-157-22-244.compute-1.amazonaws.com:3000", "ec2-18-212-128-246.compute-1.amazonaws.com:3000"]
 
 class UnavailableReplica(Exception):
     "Raised when the replica is unavailable and the client should retry."
