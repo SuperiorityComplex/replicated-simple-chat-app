@@ -34,6 +34,10 @@ database = {}
 # dict of active users
 active_users = []
 
+# Enable additional print statements
+demo_mode = False
+
+
 class ChatterServicer(main_pb2_grpc.ChatterServicer):
     def Heartbeat(self, request, context):
         return main_pb2.HeartbeatResponse(leader=leader)
@@ -42,8 +46,11 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
         global database, active_users, server_id
         database = json.loads(request.database)
         active_users = json.loads(request.active_users)
-        # print("Database", database)
-        # print("Active Users", active_users)
+        
+        if demo_mode:
+            print("Database", database)
+            print("Active Users", active_users)
+        
         save_db_to_disk(database, server_id)
         return main_pb2.UpdateResponse()
     
@@ -97,11 +104,13 @@ def get_sys_args():
     p = optparse.OptionParser()
     # normal execution flags
     p.add_option('--server_id', '-s', default="0")
+    p.add_option('--demo_mode', '-d', default="0")
 
     options, _ = p.parse_args()
     server_id = int(options.server_id)
+    demo_mode = int(options.demo_mode) == 0
 
-    return server_id
+    return server_id, demo_mode
 
 def start_server():
     """
@@ -299,8 +308,8 @@ def init_server():
 
 
 def main():
-    global server_id
-    server_id = get_sys_args()
+    global server_id, demo_mode
+    server_id, demo_mode = get_sys_args()
     
     if server_id not in [0, 1, 2]:
         print("server_id must be 0, 1, 2")
