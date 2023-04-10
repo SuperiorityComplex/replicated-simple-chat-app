@@ -21,7 +21,8 @@ run_event = threading.Event()
 server = None
 
 # Map from index to replicas host
-replica_addresses = ["ec2-54-198-22-47.compute-1.amazonaws.com:3000", "ec2-18-232-74-82.compute-1.amazonaws.com:3000", "ec2-18-234-119-162.compute-1.amazonaws.com:3000"]
+# replica_addresses = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
+replica_addresses = ["ec2-54-211-191-75.compute-1.amazonaws.com:3000", "ec2-184-73-151-136.compute-1.amazonaws.com:3001", "ec2-18-234-254-108.compute-1.amazonaws.com:3002"]
 
 # The server id of the current leader
 leader = None
@@ -46,7 +47,6 @@ class ChatterServicer(main_pb2_grpc.ChatterServicer):
         global database, active_users, server_id
         database = json.loads(request.database)
         active_users = json.loads(request.active_users)
-        
         if demo_mode:
             print("Database", database)
             print("Active Users", active_users)
@@ -108,7 +108,7 @@ def get_sys_args():
 
     options, _ = p.parse_args()
     server_id = int(options.server_id)
-    demo_mode = int(options.demo_mode) == 0
+    demo_mode = int(options.demo_mode) == 1
 
     return server_id, demo_mode
 
@@ -269,13 +269,12 @@ def handle_server_response(action, username, recipient, message):
             return main_pb2.Message(message = "Already logged in elsewhere.")
 
         active_users.append(username)
-
         if(username not in database.keys()):
             response = "User created. Welcome!"
             database[username] = []
-            send_database_and_users()
         else:
             response = "Welcome back!"
+        send_database_and_users()
 
 
         return main_pb2.Message(message = response)
@@ -310,7 +309,6 @@ def init_server():
 def main():
     global server_id, demo_mode
     server_id, demo_mode = get_sys_args()
-    
     if server_id not in [0, 1, 2]:
         print("server_id must be 0, 1, 2")
         return

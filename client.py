@@ -1,17 +1,18 @@
 import threading
-import optparse
 import grpc
 import sys
-import concurrent.futures
 import time
-import random
-import json
 sys.path.append('./grpc_stubs')
 import main_pb2
 import main_pb2_grpc
 
 # addresses of the three possible servers
-server_list = ["ec2-54-198-22-47.compute-1.amazonaws.com:3000", "ec2-18-232-74-82.compute-1.amazonaws.com:3000", "ec2-18-234-119-162.compute-1.amazonaws.com:3000"]
+# server_list = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
+server_list = ["ec2-54-211-191-75.compute-1.amazonaws.com:3000", "ec2-184-73-151-136.compute-1.amazonaws.com:3001", "ec2-18-234-254-108.compute-1.amazonaws.com:3002"]
+
+class UnavailableReplica(Exception):
+    "Raised when the replica is unavailable and the client should retry."
+    pass
 
 def listen_client_messages(stub, username):
     """
@@ -52,9 +53,8 @@ def check_response(response):
     """
     Checks if the server sent a response, and raises an error if so.
     """
-
-    if response == "ERR: NOT LEADER":
-        raise grpc._channel._InactiveRpcError
+    if response.message == "ERR: NOT LEADER":
+        raise UnavailableReplica
 
 def main():
     listen_thread = None
@@ -146,7 +146,7 @@ def main():
         # the server we connected to went down during the user action
         # this assumes that the client was connected to the leader server, then that went down, and another server has been already determined
         #           to be the leader. the client will connect to that new leader.
-        except grpc._channel._InactiveRpcError:
+        except (grpc._channel._InactiveRpcError, UnavailableReplica):
             # stop the listening thread
             listen_thread.join()
 
