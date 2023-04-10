@@ -22,7 +22,7 @@ server = None
 
 # Map from index to replicas host
 # replica_addresses = ["127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:3002"]
-replica_addresses = ["ec2-54-211-191-75.compute-1.amazonaws.com:3000", "ec2-184-73-151-136.compute-1.amazonaws.com:3001", "ec2-18-234-254-108.compute-1.amazonaws.com:3002"]
+replica_addresses = ["ec2-54-211-191-75.compute-1.amazonaws.com:3000", "ec2-184-73-151-136.compute-1.amazonaws.com:3000", "ec2-18-234-254-108.compute-1.amazonaws.com:3000"]
 
 # The server id of the current leader
 leader = None
