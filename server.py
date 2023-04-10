@@ -180,8 +180,7 @@ def send_heartbeat(stub, ext_server_id):
         live_servers[ext_server_id] = True
         global leader
         leader = response.leader
-    except (Exception) as e:
-        print(e)
+    except:
         print("Server {} is down".format(ext_server_id))
         live_servers[ext_server_id] = False
 
