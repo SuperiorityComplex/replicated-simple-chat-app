@@ -21,8 +21,7 @@ run_event = threading.Event()
 server = None
 
 # Map from index to replicas host
-self_replicas = ["0.0.0.0:3000", "0.0.0.0:3000", "0.0.0.0:3000"]
-ext_replicas = ["ec2-54-198-22-47.compute-1.amazonaws.com:3000", "ec2-18-232-74-82.compute-1.amazonaws.com:3000", "ec2-18-234-119-162.compute-1.amazonaws.com:3000"]
+replica_addresses = ["ec2-54-198-22-47.compute-1.amazonaws.com:3000", "ec2-18-232-74-82.compute-1.amazonaws.com:3000", "ec2-18-234-119-162.compute-1.amazonaws.com:3000"]
 
 # The server id of the current leader
 leader = None
@@ -117,8 +116,10 @@ def start_server():
     init_db(server_id)
     global database
     database = init_users(server_id)
-    server.add_insecure_port(self_replicas[server_id])
-    print("Started server on", self_replicas[server_id])
+    is_aws = "ec2" in replica_addresses[server_id]
+    server_address = "{}:{}".format("0.0.0.0" if is_aws else "127.0.0.1", "3000" if is_aws else "300{}".format(str(server_id)))
+    server.add_insecure_port(server_address)
+    print("Started server on", server_address)
     server.start()
     server.wait_for_termination()
 
@@ -156,7 +157,7 @@ def send_database_and_users():
         return
     for index, isAlive in enumerate(live_servers):
         if isAlive and index != leader and index != server_id:
-            channel = grpc.insecure_channel(ext_replicas[index])
+            channel = grpc.insecure_channel(replica_addresses[index])
             stub = main_pb2_grpc.ChatterStub(channel)
             try:
                 save_db_to_disk(database, server_id)
@@ -191,9 +192,7 @@ def start_heartbeat(ext_server_id):
     - ext_server_id: The id of the server (0, 1, 2).
     @Returns: None.
     """
-    channel = grpc.insecure_channel(ext_replicas[ext_server_id])
-    print(ext_replicas[ext_server_id])
-    print(channel)
+    channel = grpc.insecure_channel(replica_addresses[ext_server_id])
     stub = main_pb2_grpc.ChatterStub(channel)
     send_heartbeat(stub, ext_server_id)
     while None in live_servers:
@@ -252,9 +251,7 @@ def handle_server_response(action, username, recipient, message):
         if(recipient not in database.keys()):
             response =  "The recipient does not exist."
         else:
-            # TODO: here should send the databases out to replicas? or maybe should do it on heartbeats?
             database[recipient].append(chat)
-            # DONE
             send_database_and_users()
             response = "Message sent successfully."
         return main_pb2.Message(message = response)
